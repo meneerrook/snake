@@ -374,8 +374,6 @@ function createGameLoop () {
     
         const isGoingOutOfBounds = checkIsGoingOutOfBounds();
         const isCollidingWithTail = checkIsCollidingWithTail();
-
-        console.log(isCollidingWithTail);
         
         if (isGoingOutOfBounds || isCollidingWithTail) {
             end();
