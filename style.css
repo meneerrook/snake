@@ -1,9 +1,6 @@
 /* general */
 
 :root {
-    --snake-size: 30px;
-    --game-area-width: calc(var(--snake-size) * 40);
-    --game-area-height: calc(var(--snake-size) * 20);
     --game-area-background: #222;
 }
 
@@ -39,11 +36,6 @@ body {
     font-size: 30px;
 }
 
-.tryagain {
-    margin-top: 15px;
-    cursor: pointer;
-}
-
 /* game stuff */
 
 .game-area {
@@ -54,14 +46,12 @@ body {
     bottom: auto;
     translate: -50% -50%;
     background-color: #222;
-    width: var(--game-area-width);
-    height: var(--game-area-height);
 }
 
 .apple {
     position: absolute;
-    width: 30px;
-    height: 30px;
+    width: var(--snake-size);
+    height: var(--snake-size);
     z-index: 10;
 
     &:before {
@@ -72,8 +62,8 @@ body {
         bottom: auto;
         left: 50%;
         translate: -50% -50%;
-        width: 15px;
-        height: 15px;
+        width: calc(var(--snake-size) / 2);
+        height: calc(var(--snake-size) / 2);
         background-color: red;
     }
 
@@ -99,8 +89,8 @@ body {
     bottom: auto;
     left: 50%;
     translate: -50% -50%;
-    width: 20px;
-    height: 20px;
+    width: 75%;
+    height: 75%;
 }
 
 /* snake */
@@ -108,8 +98,8 @@ body {
 .head,
 .tail {
     position: absolute;
-    width: 30px;
-    height: 30px;
+    width: var(--snake-size);
+    height: var(--snake-size);
     box-shadow: inset 0 0 0 2px var(--game-area-background);
 }
 
@@ -127,7 +117,7 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 20px;
-    height: 20px;
+    width: 75%;
+    height: 75%;
     translate: -50% -50%;
 }

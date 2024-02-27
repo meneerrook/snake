@@ -1,8 +1,8 @@
 const directions = ["up", "right", "down", "left"];
 
 const state = {
-    gameArea: document.querySelector("#game-area"),
-    gameAreaRect: document.querySelector("#game-area").getBoundingClientRect(),
+    gameArea: null,
+    gameAreaRect: null,
     startOverlay: document.querySelector("#start-overlay"),
     pauseOverlay: document.querySelector("#pause-overlay"),
     endedOverlay: document.querySelector("#ended-overlay"),
@@ -15,8 +15,13 @@ const state = {
     paused: false,
     ended: false,
     score: 0,
-    speed: 50,
-    direction: "up"
+    speed: 100,
+    direction: "up",
+    snakeSize: 70, // 30
+    gameAreaWidthMultiplier: 27, // 40
+    gameAreaWidth: 0,
+    gameAreaHeightMultiplier: 13, // 20
+    gameAreaHeight: 0,
 };
 
 let GAME_LOOP = createGameLoop();
@@ -27,27 +32,41 @@ let GAME_LOOP = createGameLoop();
 })();
 
 function init () {
-    // create snake
-    (() => {
-        const snake = document.createElement("div");
-        snake.id = "snake";
-        snake.classList.add("snake");
-        
-        const head = document.createElement("div");
-        head.id = "head";
-        head.classList.add("head");
-        head.style.top = `${window.snake.helpers.getRandomValueInRangeWithStep(120, 450, 30)}px`;
-        head.style.left = `${window.snake.helpers.getRandomValueInRangeWithStep(120, 1050, 30)}px`;
+    // set snake size:
+    const style = document.createElement("style");
+    style.innerText = `:root{ --snake-size: ${state.snakeSize}px; }`;
+    document.querySelector("head").appendChild(style);
+    
+    // get and set game area:
+    state.gameAreaWidth = (state.snakeSize * state.gameAreaWidthMultiplier);
+    state.gameAreaHeight = (state.snakeSize * state.gameAreaHeightMultiplier);
+    state.gameArea = document.querySelector("#game-area");
+    state.gameArea.style.width = `${state.gameAreaWidth}px`;
+    state.gameArea.style.height = `${state.gameAreaHeight}px`;
+    state.gameAreaRect = state.gameArea.getBoundingClientRect();
 
-        snake.appendChild(head);
-        state.snake = snake;
-        state.head = head;
-    })();
+    // create snake
+    const snake = document.createElement("div");
+    snake.id = "snake";
+    snake.classList.add("snake");
+    
+    const head = document.createElement("div");
+    head.id = "head";
+    head.classList.add("head");
+    
+    const sideOffset = (5 * state.snakeSize);
+    const farSideY = state.gameAreaHeight - (sideOffset + state.snakeSize);
+    const farSideX = state.gameAreaWidth - (sideOffset + state.snakeSize);
+
+    head.style.top = `${window.snake.helpers.getRandomValueInRangeWithStep(sideOffset, farSideY, state.snakeSize)}px`;
+    head.style.left = `${window.snake.helpers.getRandomValueInRangeWithStep(sideOffset, farSideX, state.snakeSize)}px`;
+
+    snake.appendChild(head);
+    state.snake = snake;
+    state.head = head;
 
     // randomizeDirection
-    (() => {
-        state.direction = directions[Math.floor(Math.random() * directions.length)];
-    })();
+    state.direction = directions[Math.floor(Math.random() * directions.length)];
 }
 
 function setKeyBindings () {
@@ -139,12 +158,14 @@ function generateApple () {
         return { x, y }; 
     });
 
-    let appleYPosition = window.snake.helpers.getRandomValueInRangeWithStep(0, 570, 30);
-    let appleXPosition = window.snake.helpers.getRandomValueInRangeWithStep(0, 1170, 30);
+    let farSideY = (state.gameAreaHeight - state.snakeSize);
+    let farSideX = (state.gameAreaWidth - state.snakeSize);
+    let appleYPosition = window.snake.helpers.getRandomValueInRangeWithStep(0, farSideY, state.snakeSize);
+    let appleXPosition = window.snake.helpers.getRandomValueInRangeWithStep(0, farSideX, state.snakeSize);
 
     while (disallowedPositions.every(position => position.x === appleXPosition && position.y === appleYPosition)) {
-        appleYPosition = window.snake.helpers.getRandomValueInRangeWithStep(0, 570, 30);
-        appleXPosition = window.snake.helpers.getRandomValueInRangeWithStep(0, 1170, 30);
+        appleYPosition = window.snake.helpers.getRandomValueInRangeWithStep(0, farSideY, state.snakeSize);
+        appleXPosition = window.snake.helpers.getRandomValueInRangeWithStep(0, farSideX, state.snakeSize);
     }
 
     const apple = document.createElement("div");
@@ -164,13 +185,13 @@ function checkIsGoingOutOfBounds () {
     let headRect = state.head.getBoundingClientRect();
 
     if (state.direction === "up") {
-        willBeOutOfBounds = (headRect.top - 30) < state.gameAreaRect.top;
+        willBeOutOfBounds = (headRect.top - state.snakeSize) < state.gameAreaRect.top;
     } else if (state.direction === "right") {
-        willBeOutOfBounds = (headRect.right + 30) > state.gameAreaRect.right;
+        willBeOutOfBounds = (headRect.right + state.snakeSize) > state.gameAreaRect.right;
     } else if (state.direction === "down") {
-        willBeOutOfBounds = (headRect.bottom + 30) > state.gameAreaRect.bottom;
+        willBeOutOfBounds = (headRect.bottom + state.snakeSize) > state.gameAreaRect.bottom;
     } else if (state.direction === "left") {
-        willBeOutOfBounds = (headRect.left - 30) < state.gameAreaRect.left;
+        willBeOutOfBounds = (headRect.left - state.snakeSize) < state.gameAreaRect.left;
     }
 
     return willBeOutOfBounds;
@@ -190,11 +211,11 @@ function checkIsCollidingWithTail () {
                 headRect.right < innerRect.left ||
                 headRect.left > innerRect.right ||
                 headRect.bottom < innerRect.top ||
-                (headRect.top - 30) > innerRect.bottom
+                (headRect.top - state.snakeSize) > innerRect.bottom
             );
         } else if (state.direction === "right") {
             willCollideWithTail = !(
-                (headRect.right + 30) < innerRect.left ||
+                (headRect.right + state.snakeSize) < innerRect.left ||
                 headRect.left > innerRect.right ||
                 headRect.bottom < innerRect.top ||
                 headRect.top > innerRect.bottom
@@ -203,13 +224,13 @@ function checkIsCollidingWithTail () {
             willCollideWithTail = !(
                 headRect.right < innerRect.left ||
                 headRect.left > innerRect.right ||
-                (headRect.bottom + 30) < innerRect.top ||
+                (headRect.bottom + state.snakeSize) < innerRect.top ||
                 headRect.top > innerRect.bottom
             );
         } else if (state.direction === "left") {
             willCollideWithTail = !(
                 headRect.right < innerRect.left ||
-                (headRect.left - 30) > innerRect.right ||
+                (headRect.left - state.snakeSize) > innerRect.right ||
                 headRect.bottom < innerRect.top ||
                 headRect.top > innerRect.bottom
             );
@@ -228,13 +249,13 @@ function move () {
     let left = +state.head.style.left.replace("px", "");
 
     if (state.direction === "up") {
-        top -= 30;
+        top -= state.snakeSize;
     } else if (state.direction === "right") {
-        left += 30;
+        left += state.snakeSize;
     } else if (state.direction === "down") {
-        top += 30;
+        top += state.snakeSize;
     } else if (state.direction === "left") {
-        left -= 30;
+        left -= state.snakeSize;
     }
 
     state.head.style.top = `${top}px`;
@@ -263,13 +284,13 @@ function move () {
         let left = +attachTo.style.left.replace("px", "");
     
         if (direction === "up") {
-            top += 30;
+            top += state.snakeSize;
         } else if (direction === "right") {
-            left -= 30;
+            left -= state.snakeSize;
         } else if (direction === "down") {
-            top -= 30;
+            top -= state.snakeSize;
         } else if (direction === "left") {
-            left += 30;
+            left += state.snakeSize;
         }
     
         state.tail[i].style.top = `${top}px`;
@@ -348,13 +369,13 @@ function grow () {
     let left = +attachTo.style.left.replace("px", "");
     
     if (direction === "up") {
-        top += 30;
+        top += state.snakeSize;
     } else if (direction === "right") {
-        left -= 30;
+        left -= state.snakeSize;
     } else if (direction === "down") {
-        top -= 30;
+        top -= state.snakeSize;
     } else if (direction === "left") {
-        left += 30;
+        left += state.snakeSize;
     }
 
     tail.style.top = `${top}px`;
