@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <div id="start-overlay" class="start-overlay">
+        <div>Click Enter to start.</div>
+    </div>
+
+    <div id="pause-overlay" class="pause-overlay hidden">
+        <div>Paused, click "p" to continue.</div>
+    </div>    
+    <div id="ended-overlay" class="ended-overlay hidden">
+        <div>Game over, your score: <span data-score>0</span><br/>Click Enter to try again</div>
+    </div>
+    
+    <div id="game-area" class="game-area"></div>
+
+    <script src="helpers.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>

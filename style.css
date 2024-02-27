@@ -1,0 +1,133 @@
+/* general */
+
+:root {
+    --snake-size: 30px;
+    --game-area-width: calc(var(--snake-size) * 40);
+    --game-area-height: calc(var(--snake-size) * 20);
+    --game-area-background: #222;
+}
+
+body {
+    background-color: #111;
+    font-family: arial;
+}
+
+/* generics */
+
+.hidden {
+    display: none !important;
+    pointer-events: none !important;
+}
+
+/* overlays */
+
+.start-overlay,
+.pause-overlay,
+.ended-overlay {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 100;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #fff;
+    font-size: 30px;
+}
+
+.tryagain {
+    margin-top: 15px;
+    cursor: pointer;
+}
+
+/* game stuff */
+
+.game-area {
+    position: fixed;
+    top: 50%;
+    right: auto;
+    left: 50%;
+    bottom: auto;
+    translate: -50% -50%;
+    background-color: #222;
+    width: var(--game-area-width);
+    height: var(--game-area-height);
+}
+
+.apple {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    z-index: 10;
+
+    &:before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: auto;
+        bottom: auto;
+        left: 50%;
+        translate: -50% -50%;
+        width: 15px;
+        height: 15px;
+        background-color: red;
+    }
+
+    &:after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: auto;
+        bottom: auto;
+        left: 50%;
+        translate: -50% 2px;
+        rotate: 45deg;
+        width: 5px;
+        height: 7px;
+        background-color: green;
+    }
+}
+
+.apple-inner {
+    position: absolute;
+    top: 50%;
+    right: auto;
+    bottom: auto;
+    left: 50%;
+    translate: -50% -50%;
+    width: 20px;
+    height: 20px;
+}
+
+/* snake */
+
+.head,
+.tail {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    box-shadow: inset 0 0 0 2px var(--game-area-background);
+}
+
+.head {
+    background-color: #fff;
+    z-index: 30;
+}
+
+.tail {
+    background-color: #616161;
+    z-idnex: 20;
+}
+
+.inner-tail {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    translate: -50% -50%;
+}
