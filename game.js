@@ -17,11 +17,12 @@ const state = {
     score: 0,
     speed: 100,
     direction: "up",
-    snakeSize: 70, // 30
-    gameAreaWidthMultiplier: 27, // 40
+    snakeSize: 30, // 30
+    gameAreaWidthMultiplier: 40, // 40
     gameAreaWidth: 0,
-    gameAreaHeightMultiplier: 13, // 20
+    gameAreaHeightMultiplier: 20, // 20
     gameAreaHeight: 0,
+    autoSizeGameArea: true
 };
 
 let GAME_LOOP = createGameLoop();
@@ -37,7 +38,14 @@ function init () {
     style.innerText = `:root{ --snake-size: ${state.snakeSize}px; }`;
     document.querySelector("head").appendChild(style);
     
+
     // get and set game area:
+    if (state.autoSizeGameArea) {
+        state.gameAreaWidthMultiplier = (Math.floor(window.innerWidth / state.snakeSize) - 1);
+        state.gameAreaHeightMultiplier = (Math.floor(window.innerHeight / state.snakeSize) - 1);
+    }
+
+        
     state.gameAreaWidth = (state.snakeSize * state.gameAreaWidthMultiplier);
     state.gameAreaHeight = (state.snakeSize * state.gameAreaHeightMultiplier);
     state.gameArea = document.querySelector("#game-area");
@@ -131,6 +139,16 @@ function preStart () {
     state.started = true;
     
     generateApple();
+    grow();
+    grow();
+    grow();
+    grow();
+    grow();
+    grow();
+    grow();
+    grow();
+    grow();
+    grow();
     start();
 }
 
@@ -146,8 +164,22 @@ function pause () {
 
 function end () {
     state.ended = true;
-    state.endedOverlay.classList.remove("hidden");
-    document.querySelector("[data-score]").innerText = state.score;
+
+    const tailToRemove = Array.from(state.tail);
+
+    const removeInterval = setInterval(() => {
+        if (tailToRemove.length === 0) {
+            clearInterval(removeInterval);
+        } else {
+            const tailItem = tailToRemove.pop()
+            tailItem.remove();
+        }
+    }, 50);
+
+    setTimeout(() => {
+        state.endedOverlay.classList.remove("hidden");
+        document.querySelector("[data-score]").innerText = state.score;
+    }, (state.tail.length * 50) + 100);
 }
 
 function generateApple () {
